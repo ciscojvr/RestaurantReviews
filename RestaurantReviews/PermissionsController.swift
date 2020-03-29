@@ -7,8 +7,17 @@
 //
 
 import UIKit
+import OAuth2
 
 class PermissionsController: UIViewController {
+    
+    let oauth = OAuth2ClientCredentials(settings: [
+        "client_id": "yRKAbh4G5nmglkMM0wmPVQ",
+        "client_secret": "_FcNgC16kI-jTBCj6CeMPWxoFK92wMt_llxBlpKnQ2uwANP5b6GtZhycE-bJD6TgYeq7dr3IKvFtyssO__U_sNY0uZQbZugA-7-C7XIP0BrvhNCgfFAk-dYNgAuBXnYx",
+        "authorize_uri": "https://api.yelp.com/oauth2/token",
+        "secret_in_body": true,
+        "keychain": false
+    ])
     
     var isAuthorizedForLocation: Bool
     var isAuthenticatedWithToken: Bool
@@ -110,6 +119,14 @@ class PermissionsController: UIViewController {
     }
     
     @objc func requestOAuthToken() {
+        oauth.authorize { authParams, error in
+            if let params = authParams {
+                guard let token = params["access_token"] as? String, let expiration = params["expires_in"] as? TimeInterval else { return }
+                let account = YelpAccount(accessToken: token, expiration: expiration, grantDate: Date())
+            } else {
+                print("Authorization was cancelled or went wrong: \(error!)")
+            }
+        }
     }
     
     @objc func dismissPermissions() {
