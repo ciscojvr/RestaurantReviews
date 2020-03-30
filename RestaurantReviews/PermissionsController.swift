@@ -21,7 +21,7 @@ class PermissionsController: UIViewController, LocationPermissionsDelegate {
     ])
     
     lazy var locationManager: LocationManager = {
-        return LocationManager(permissionsDelegate: self)
+        return LocationManager(delegate:nil, permissionsDelegate: self)
     }()
     
     var isAuthorizedForLocation: Bool

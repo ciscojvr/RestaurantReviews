@@ -20,6 +20,11 @@ protocol LocationPermissionsDelegate: class {
     func authorizationFailedWithStatus(_ status: CLAuthorizationStatus)
 }
 
+protocol LocationManagerDelegate: class {
+    func obtainedCoordinate(_ coordinate: Coordinate)
+    func failedWithError(_ error: LocationError)
+}
+
 // Class will:
 // 1. Request permissions to get location updates from the user
 // 2. Starting Location Service
@@ -28,8 +33,10 @@ protocol LocationPermissionsDelegate: class {
 class LocationManager: NSObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
     weak var permissionsDelegate: LocationPermissionsDelegate?
+    weak var delegate: LocationManagerDelegate?
     
-    init(permissionsDelegate: LocationPermissionsDelegate?) {
+    init(delegate: LocationManagerDelegate?, permissionsDelegate: LocationPermissionsDelegate?) {
+        self.delegate = delegate
         self.permissionsDelegate = permissionsDelegate
         super.init()
         manager.delegate = self
@@ -47,11 +54,28 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         }
     }
     
+    func requestLocation() {
+        manager.requestLocation()
+    }
+    
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse {
             permissionsDelegate?.authorizationSucceeded()
         } else {
             permissionsDelegate?.authorizationFailedWithStatus(status)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        guard let error = error as? CLError else {
+            delegate?.failedWithError(.unknownError)
+            return
+        }
+        
+        switch error.code {
+        case .locationUnknown, .network: delegate?.failedWithError(.unableToFindLocation)
+        case .denied: delegate?.failedWithError(.disallowedByUser)
+        default: return
         }
     }
 }
