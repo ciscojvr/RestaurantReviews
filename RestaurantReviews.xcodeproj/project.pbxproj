@@ -12,6 +12,7 @@
 		746E8441243146FF00E0074F /* YelpAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746E8440243146FF00E0074F /* YelpAccount.swift */; };
 		746E844324314C5000E0074F /* Locksmith.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 746E844224314C5000E0074F /* Locksmith.framework */; };
 		746E844424314C5000E0074F /* Locksmith.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 746E844224314C5000E0074F /* Locksmith.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		746E844C2432850100E0074F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746E844B2432850100E0074F /* LocationManager.swift */; };
 		97D629DA1EC23110007BE0CE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D629D91EC23110007BE0CE /* AppDelegate.swift */; };
 		97D629DC1EC23110007BE0CE /* YelpSearchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97D629DB1EC23110007BE0CE /* YelpSearchController.swift */; };
 		97D629DF1EC23110007BE0CE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97D629DD1EC23110007BE0CE /* Main.storyboard */; };
@@ -55,6 +56,7 @@
 		746E843B2431416900E0074F /* OAuth2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OAuth2.framework; path = Carthage/Build/iOS/OAuth2.framework; sourceTree = "<group>"; };
 		746E8440243146FF00E0074F /* YelpAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YelpAccount.swift; sourceTree = "<group>"; };
 		746E844224314C5000E0074F /* Locksmith.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Locksmith.framework; path = Carthage/Build/iOS/Locksmith.framework; sourceTree = "<group>"; };
+		746E844B2432850100E0074F /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		97D629D61EC23110007BE0CE /* RestaurantReviews.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RestaurantReviews.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97D629D91EC23110007BE0CE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		97D629DB1EC23110007BE0CE /* YelpSearchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YelpSearchController.swift; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 			children = (
 				97D62A041EC233D8007BE0CE /* PermissionsController.swift */,
 				746E8440243146FF00E0074F /* YelpAccount.swift */,
+				746E844B2432850100E0074F /* LocationManager.swift */,
 			);
 			name = Permissions;
 			sourceTree = "<group>";
@@ -304,6 +307,7 @@
 				97D62A151EC239D6007BE0CE /* ReviewCell.swift in Sources */,
 				97D629F01EC231C4007BE0CE /* YelpBusiness.swift in Sources */,
 				97D62A061EC233D8007BE0CE /* PermissionsController.swift in Sources */,
+				746E844C2432850100E0074F /* LocationManager.swift in Sources */,
 				97D629FF1EC2332D007BE0CE /* Address.swift in Sources */,
 				97D62A171EC245BB007BE0CE /* ReviewCellViewModel.swift in Sources */,
 				97D629FD1EC23311007BE0CE /* YelpCategory.swift in Sources */,

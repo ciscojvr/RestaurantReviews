@@ -8,8 +8,9 @@
 
 import UIKit
 import OAuth2
+import CoreLocation
 
-class PermissionsController: UIViewController {
+class PermissionsController: UIViewController, LocationPermissionsDelegate {
     
     let oauth = OAuth2ClientCredentials(settings: [
         "client_id": "yRKAbh4G5nmglkMM0wmPVQ",
@@ -18,6 +19,10 @@ class PermissionsController: UIViewController {
         "secret_in_body": true,
         "keychain": false
     ])
+    
+    lazy var locationManager: LocationManager = {
+        return LocationManager(permissionsDelegate: self)
+    }()
     
     var isAuthorizedForLocation: Bool
     var isAuthenticatedWithToken: Bool
@@ -116,6 +121,13 @@ class PermissionsController: UIViewController {
     }
     
     @objc func requestLocationPermissions() {
+        do {
+            try locationManager.requestLocationAuthorization()
+        } catch LocationError.disallowedByUser {
+            // Show alert to users
+        } catch let error {
+            print("Location Authorization Error: \(error.localizedDescription)")
+        }
     }
     
     @objc func requestOAuthToken() {
@@ -136,6 +148,16 @@ class PermissionsController: UIViewController {
     
     @objc func dismissPermissions() {
         dismiss(animated: true, completion: nil)
+    }
+    
+    // MARK: Location Permissions Delegate
+    func authorizationSucceeded() {
+        locationPermissionButton.setTitle("Location Permissions Granted", for: .disabled)
+        locationPermissionButton.isEnabled = false
+    }
+    
+    func authorizationFailedWithStatus(_ status: CLAuthorizationStatus) {
+        //
     }
 
 }
