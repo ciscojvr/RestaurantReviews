@@ -157,7 +157,16 @@ class PermissionsController: UIViewController, LocationPermissionsDelegate {
     }
     
     func authorizationFailedWithStatus(_ status: CLAuthorizationStatus) {
-        //
+        // Show an alert
+        let alertController = UIAlertController(title: "What? Disallowed?!", message: "Are you serious??", preferredStyle: UIAlertController.Style.alert)
+        alertController.addAction(UIAlertAction(title: "OK Jump to Settings", style: .default, handler: { (action) in
+            
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString + Bundle.main.bundleIdentifier!) {
+                UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+            }
+        }))
+        
+        self.present(alertController, animated: true, completion: nil)
     }
 
 }
