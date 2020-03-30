@@ -9,6 +9,13 @@
 import Foundation
 import CoreLocation
 
+extension Coordinate {
+    init(location: CLLocation) {
+        self.latitude = location.coordinate.latitude
+        self.longitude = location.coordinate.longitude
+    }
+}
+
 enum LocationError: Error {
     case unknownError
     case disallowedByUser
@@ -40,6 +47,13 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         self.permissionsDelegate = permissionsDelegate
         super.init()
         manager.delegate = self
+    }
+    
+    static var isAuthorized: Bool {
+        switch CLLocationManager.authorizationStatus() {
+        case .authorizedWhenInUse: return true
+        default: return false
+        }
     }
     
     func requestLocationAuthorization() throws {
@@ -77,5 +91,16 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         case .denied: delegate?.failedWithError(.disallowedByUser)
         default: return
         }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else {
+            delegate?.failedWithError(.unableToFindLocation)
+            return
+        }
+        
+        let coordinate = Coordinate(location: location)
+        
+        delegate?.obtainedCoordinate(coordinate)
     }
 }
