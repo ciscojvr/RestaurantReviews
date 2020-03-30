@@ -28,7 +28,7 @@ protocol LocationPermissionsDelegate: class {
 }
 
 protocol LocationManagerDelegate: class {
-    func obtainedCoordinate(_ coordinate: Coordinate)
+    func obtainedCoordinates(_ coordinate: Coordinate)
     func failedWithError(_ error: LocationError)
 }
 
@@ -101,6 +101,6 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         
         let coordinate = Coordinate(location: location)
         
-        delegate?.obtainedCoordinate(coordinate)
+        delegate?.obtainedCoordinates(coordinate)
     }
 }

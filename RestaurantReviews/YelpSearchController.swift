@@ -17,6 +17,12 @@ class YelpSearchController: UIViewController {
     
     let dataSource = YelpSearchResultsDataSource()
     
+    lazy var locationManager: LocationManager = {
+        return LocationManager(delegate: self, permissionsDelegate: nil)
+    }()
+    
+    var coordinate: Coordinate? // we have to make this property optional otherwise we have to deal with UIViewController's initialization rules.
+    
     var isAuthorized: Bool {
         let isAuthorizedWithYelpToken = YelpAccount.isAuthorized
         let isAuthorizedForLocation = LocationManager.isAuthorized
@@ -32,7 +38,9 @@ class YelpSearchController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        if !isAuthorized {
+        if isAuthorized {
+            locationManager.requestLocation()
+        } else {
             checkPermissions()
         }
     }
@@ -87,6 +95,20 @@ extension YelpSearchController {
         if segue.identifier == "showBusiness" {
             
         }
+    }
+}
+
+// MARK: - Location Manager Delegate
+
+// Since the YelpSearchController is acting as the delegate to the LocationManager, we need to conform to the protocol and provide implementations for the required methods.
+extension YelpSearchController: LocationManagerDelegate {
+    func obtainedCoordinates(_ coordinate: Coordinate) {
+        self.coordinate = coordinate
+        print(coordinate)
+    }
+    
+    func failedWithError(_ error: LocationError) {
+        print(error)
     }
 }
 
