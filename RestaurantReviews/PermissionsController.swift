@@ -123,6 +123,11 @@ class PermissionsController: UIViewController {
             if let params = authParams {
                 guard let token = params["access_token"] as? String, let expiration = params["expires_in"] as? TimeInterval else { return }
                 let account = YelpAccount(accessToken: token, expiration: expiration, grantDate: Date())
+                do {
+                    try? account.save() // using ? here so it can silently fail to avoid error handling for now.
+                    self.oauthTokenButton.setTitle("OAuth Token Granted", for: .disabled)
+                    self.oauthTokenButton.isEnabled = false
+                }
             } else {
                 print("Authorization was cancelled or went wrong: \(error!)")
             }
