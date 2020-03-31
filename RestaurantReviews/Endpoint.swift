@@ -42,7 +42,7 @@ extension Endpoint {
         
         oauthRequest.addValue("Bearer \(oauthToken)", forHTTPHeaderField: "Authorization")
         
-        return request
+        return oauthRequest
     }
 }
 

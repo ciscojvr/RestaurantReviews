@@ -21,7 +21,20 @@ class YelpSearchController: UIViewController {
         return LocationManager(delegate: self, permissionsDelegate: nil)
     }()
     
-    var coordinate: Coordinate? // we have to make this property optional otherwise we have to deal with UIViewController's initialization rules.
+    lazy var client: YelpClient = { // When initializing YelpClient, we need an OAuth token here. We're making this a lazy stored property with a closure, so that inside the closure we can load our token from the key chain and use it.
+        let yelpAccount = YelpAccount.loadFromKeychain()
+        let oauthToken = yelpAccount!.accessToken
+        
+        return YelpClient(oauthToken: oauthToken)
+    }()
+    
+    var coordinate: Coordinate? {
+        didSet {
+            if let coordinate = coordinate {
+                showNearbyRestaurants(at: coordinate)
+            }
+        }
+    } // we have to make this property optional otherwise we have to deal with UIViewController's initialization rules.
     
     var isAuthorized: Bool {
         let isAuthorizedWithYelpToken = YelpAccount.isAuthorized
@@ -51,6 +64,18 @@ class YelpSearchController: UIViewController {
         self.tableView.delegate = self
     }
     
+    func showNearbyRestaurants(at coordinate: Coordinate) {
+        client.search(withTerm: "", at: coordinate) { [weak self] result in
+            switch result {
+            case .success(let businesses):
+                self?.dataSource.update(with: businesses)
+                self?.tableView.reloadData()
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     
     // MARK: - Search
     
@@ -77,15 +102,29 @@ class YelpSearchController: UIViewController {
 
 // MARK: - UITableViewDelegate
 extension YelpSearchController: UITableViewDelegate {
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // programmatically executing a segue and transitioning to the destination view controller.
+        performSegue(withIdentifier: "showBusiness", sender: nil)
+    }
 }
 
 // MARK: - Search Results
 extension YelpSearchController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        guard let searchTerm = searchController.searchBar.text else { return }
+        guard let searchTerm = searchController.searchBar.text, let coordinate = coordinate else { return }
         
-        print("Search text: \(searchTerm)")
+        if !searchTerm.isEmpty {
+            // because we are using a closure below that is going to be executed in the background thread. And we need to capture self to update the data model, we capture self weakly.
+            client.search(withTerm: searchTerm, at: coordinate) { [weak self] result in
+                switch result {
+                case .success(let businesses):
+                    self?.dataSource.update(with: businesses)
+                    self?.tableView.reloadData()
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        }
     }
 }
 
