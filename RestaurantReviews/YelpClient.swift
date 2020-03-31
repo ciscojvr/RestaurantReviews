@@ -36,6 +36,7 @@ class YelpClient: APIClient {
         }, completion: completion)
     }
     
+    // queries the fusion API for details about a business
     func businessWithId(_ id: String, completion: @escaping (Result<YelpBusiness, APIError>) -> Void) {
         let endpoint = Yelp.business(id: id)
         let request = endpoint.requestWithAuthorizationHeader(oauthToken: self.token)
@@ -45,6 +46,7 @@ class YelpClient: APIClient {
         }, completion: completion)
     }
     
+    // queries the fusion API for details about a business
     func updateWithHoursAndPhotos(_ business: YelpBusiness, completion: @escaping (Result<YelpBusiness, APIError>) -> Void) {
         let endpoint = Yelp.business(id: business.id)
         let request = endpoint.requestWithAuthorizationHeader(oauthToken: self.token)
