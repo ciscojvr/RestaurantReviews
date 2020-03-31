@@ -75,6 +75,17 @@ class YelpSearchController: UIViewController {
             case .success(let businesses):
                 self?.dataSource.update(with: businesses)
                 self?.tableView.reloadData()
+                
+                let annotations: [MKPointAnnotation] = businesses.map { business in
+                    let point = MKPointAnnotation()
+                    point.coordinate = CLLocationCoordinate2D(latitude: business.location.latitude, longitude: business.location.longitude)
+                    
+                    point.title = business.name
+                    point.subtitle = business.isClosed ? "Closed" : "Open"
+                    return point
+                }
+                
+                self?.mapView.addAnnotations(annotations)
             case .failure(let error):
                 print(error)
             }
@@ -146,6 +157,20 @@ extension YelpSearchController: UISearchResultsUpdating {
                 case .success(let businesses):
                     self?.dataSource.update(with: businesses)
                     self?.tableView.reloadData()
+                    
+                    self?.mapView.removeAnnotations(self!.mapView.annotations) // at this point, we're calling removeAnnotations, we are assuming that we do have some so we just force unwrap self and grab the annotations from the exisiting map view
+                    
+                    let annotations: [MKPointAnnotation] = businesses.map { business in
+                        let point = MKPointAnnotation()
+                        point.coordinate = CLLocationCoordinate2D(latitude: business.location.latitude, longitude: business.location.longitude)
+                        
+                        point.title = business.name
+                        point.subtitle = business.isClosed ? "Closed" : "Open"
+                        return point
+                    }
+                    
+                    self?.mapView.addAnnotations(annotations)
+                    
                 case .failure(let error):
                     print(error)
                 }
