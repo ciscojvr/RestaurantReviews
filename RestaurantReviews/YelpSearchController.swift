@@ -159,6 +159,7 @@ extension YelpSearchController {
                 let business = dataSource.object(at: indexPath)
                 let detailController = segue.destination as! YelpBusinessDetailController
                 detailController.business = business
+                detailController.dataSource.updateData(business.reviews)
             }
         }
     }
