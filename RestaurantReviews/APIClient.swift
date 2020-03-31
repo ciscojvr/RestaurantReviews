@@ -8,11 +8,6 @@
 
 import Foundation
 
-protocol APIClient {
-    // every APIClient must have a session object. With this session we can create data tasks that fetch JSON from a given URL.
-    var session: URLSession { get }
-}
-
 enum APIError: Error {
     case requestFailed
     case jsonConversionFailure
@@ -29,6 +24,16 @@ enum APIError: Error {
         case .jsonConversionFailure: return "JSON Conversion Failure"
         }
     }
+}
+
+protocol APIClient {
+    // every APIClient must have a session object. With this session we can create data tasks that fetch JSON from a given URL.
+    var session: URLSession { get }
+    
+    // the parse argument below accepts a function, or an escaping closure rather, that takes some JSON and returns an optional T. T is optional because we may get invalid JSON data back in which case we're going to return nil.
+    func fetch<T: JSONDecodable>(with request: URLRequest, parse: @escaping (JSON) -> T?, completion: @escaping (Result<T, APIError>) -> Void)
+    
+    func fetch<T: JSONDecodable>(with request: URLRequest, parse: @escaping (JSON) -> [T], completion: @escaping (Result<[T], APIError>) -> Void)
 }
 
 extension APIClient {
