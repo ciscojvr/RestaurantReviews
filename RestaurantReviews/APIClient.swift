@@ -67,4 +67,31 @@ extension APIClient {
         }
         return task
     }
+    
+    // the fetch function below is our way of "fetching" data from the server, and getting a populated model.
+    // it doesn't give us any concrete types just yet but that alright because our protocol is powerful enough to encapsulate all this information.
+    func fetch<T: JSONDecodable>(with request: URLRequest, parse: @escaping (JSON) -> T?, completion: @escaping (Result<T, APIError>) -> Void) {
+        
+        let task = jsonTask(with: request) { json, error in
+            
+            DispatchQueue.main.async {
+                guard let json = json else {
+                    if let error = error {
+                        completion(Result.failure(error))
+                    } else {
+                        completion(Result.failure(.invalidData))
+                    }
+                    return
+                }
+                
+                if let value = parse(json) {
+                    completion(.success(value))
+                } else {
+                    completion(.failure(.jsonParsingFailure))
+                }
+            }
+        }
+        
+        task.resume()
+    }
 }
