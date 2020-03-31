@@ -36,6 +36,8 @@ class YelpSearchController: UIViewController {
         }
     } // we have to make this property optional otherwise we have to deal with UIViewController's initialization rules.
     
+    let queue = OperationQueue()
+    
     var isAuthorized: Bool {
         let isAuthorizedWithYelpToken = YelpAccount.isAuthorized
         let isAuthorizedForLocation = LocationManager.isAuthorized
@@ -103,8 +105,21 @@ class YelpSearchController: UIViewController {
 // MARK: - UITableViewDelegate
 extension YelpSearchController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // programmatically executing a segue and transitioning to the destination view controller.
-        performSegue(withIdentifier: "showBusiness", sender: nil)
+        
+        let business = dataSource.object(at: indexPath)
+        
+        let operation = YelpBusinessDetailsOperation(business: business, client: self.client)
+        
+        operation.completionBlock = {
+            // since the operation will likely be executed on a backgroud thread, we'll make sure we execute this code on the main thread.
+            DispatchQueue.main.async {
+                self.dataSource.update(business, at: indexPath)
+                
+                // programmatically executing a segue and transitioning to the destination view controller.
+                self.performSegue(withIdentifier: "showBusiness", sender: nil)
+            }
+        }
+        queue.addOperation(operation)
     }
 }
 
@@ -132,7 +147,11 @@ extension YelpSearchController: UISearchResultsUpdating {
 extension YelpSearchController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showBusiness" {
-            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let business = dataSource.object(at: indexPath)
+                let detailController = segue.destination as! YelpBusinessDetailController
+                detailController.business = business
+            }
         }
     }
 }
