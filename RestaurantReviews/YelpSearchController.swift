@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MapKit
 
 class YelpSearchController: UIViewController {
     
@@ -14,6 +15,8 @@ class YelpSearchController: UIViewController {
     
     let searchController = UISearchController(searchResultsController: nil)
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var mapView: MKMapView!
+    
     
     let dataSource = YelpSearchResultsDataSource()
     
@@ -171,11 +174,25 @@ extension YelpSearchController {
 extension YelpSearchController: LocationManagerDelegate {
     func obtainedCoordinates(_ coordinate: Coordinate) {
         self.coordinate = coordinate
-        print(coordinate)
+//        print(coordinate)
+        adjustMap(with: coordinate)
     }
     
     func failedWithError(_ error: LocationError) {
         print(error)
+    }
+}
+
+// MARK: - MapKit
+extension YelpSearchController {
+    func adjustMap(with coordinate: Coordinate) {
+        let coordinate2D = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        
+        // the span value encapsulates the level of zoom we need for a given map, given our specific coordinates and the distance we want to show on the map.
+        let span = MKCoordinateRegion(center: coordinate2D, latitudinalMeters: 2500, longitudinalMeters: 2500).span
+        
+        let region = MKCoordinateRegion(center: coordinate2D, span: span)
+        mapView.setRegion(region, animated: true)
     }
 }
 
