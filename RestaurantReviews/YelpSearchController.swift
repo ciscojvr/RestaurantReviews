@@ -108,9 +108,16 @@ extension YelpSearchController: UITableViewDelegate {
         
         let business = dataSource.object(at: indexPath)
         
-        let operation = YelpBusinessDetailsOperation(business: business, client: self.client)
+        let detailsOperation = YelpBusinessDetailsOperation(business: business, client: self.client)
         
-        operation.completionBlock = {
+        let reviewsOperation = YelpBusinessReviewsOperation(business: business, client: client)
+        
+        // to ensure that the reviews operation only executes upon completion of the first one, we can make it a dependency of the first operation. We want the reviews operation to execute after the details operation is done, so we add the details operation as a dependency of the reviews operation.
+        reviewsOperation.addDependency(detailsOperation)
+        
+        // by linking these dependencies we're ensuring that our queue is effectively a serial queue, executing one operation at once.
+        
+        reviewsOperation.completionBlock = {
             // since the operation will likely be executed on a backgroud thread, we'll make sure we execute this code on the main thread.
             DispatchQueue.main.async {
                 self.dataSource.update(business, at: indexPath)
@@ -119,7 +126,8 @@ extension YelpSearchController: UITableViewDelegate {
                 self.performSegue(withIdentifier: "showBusiness", sender: nil)
             }
         }
-        queue.addOperation(operation)
+        queue.addOperation(detailsOperation)
+        queue.addOperation(reviewsOperation)
     }
 }
 
